@@ -6,8 +6,7 @@
 # Folders
 _obj
 _test
-.vscode
-.idea
+
 pkg 
 bin
 
@@ -27,5 +26,8 @@ _testmain.go
 *.test
 *.prof
 
+#Editor remainings
+.vscode
+.idea
 *.sublime-workspace
 *.sublime-project
