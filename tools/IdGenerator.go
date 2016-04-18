@@ -21,10 +21,3 @@ func GenSID(namespace string) string {
 func SetLastSID(namespace string, id uint) {
 	sidstore[namespace] = id
 }
-
-func TestID(namespace string, id uint) {
-
-}
-
-func TestSID(namespace string, id uint) {
-}

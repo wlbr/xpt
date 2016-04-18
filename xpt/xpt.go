@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
-	"xpt/tools"
+	"xpt/model"
 )
 
-func testIdGeneration() {
+func testKnowledgebase() {
+	kb := []model.KnowledgebaseObject{model.NewQuestion("My first Question"),
+		model.NewTextQuestion("Another Question"),
+		model.NewNumQuestion("Another Question"),
+		model.NewOcQuestion("OneChoice Question"),
+		model.NewMcQuestion("MultipleChoice Question"),
+		model.NewTheses("This is an assumption."),
+	}
 
-	fmt.Printf("first %s \n", tools.GenSID("first"))
-	fmt.Printf("first %s \n", tools.GenSID("first"))
-	fmt.Printf("second %s \n", tools.GenSID("second"))
-	fmt.Printf("second %s \n", tools.GenSID("second"))
-	fmt.Printf("first %s \n", tools.GenSID("first"))
-	tools.SetLastSID("first", 10)
-	fmt.Print("setting first to 10")
-	fmt.Printf("first %s \n", tools.GenSID("first"))
-	fmt.Printf("second %s \n", tools.GenSID("second"))
-	fmt.Printf("first %s \n", tools.GenSID("first"))
+	for _, i := range kb {
+		fmt.Println(i)
+	}
 }
 
 func main() {
-	testIdGeneration()
+	fmt.Println()
+	testKnowledgebase()
 }
