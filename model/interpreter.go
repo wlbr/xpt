@@ -1,7 +1,13 @@
 package model
 
+/* we deviate from the Constructor convention (New...) by intention, to enable concise
+   expressions like
+	a := And(Equals(Variable(7), Variable(6)), Equals(Variable(5), Variable(5)))
+*/
 type Expression interface {
-	Interprete(map[string]Expression) bool
+	
+	
+	    Interprete(map[string]Expression) bool
 	//Interprete(Map<String,Expression> variables) bool
 }
 
