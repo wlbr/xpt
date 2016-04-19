@@ -84,7 +84,3 @@ func Not(operand Expression) *NotExpression {
 func (s *NotExpression) Interprete(variables map[string]Expression) bool {
 	return !s.operand.Interprete(variables)
 }
-
-func (s Fact) Interprete(variables map[string]Expression) bool {
-	return true
-}

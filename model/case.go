@@ -8,17 +8,17 @@ type Case struct {
 type Fact struct {
 	AbstractKnowledgebaseObject
 	id       string
-	question *Question
+	question *abstractQuestion
 }
 
-func NewFact(question *Question) *Fact {
+func NewFact(question *abstractQuestion) *Fact {
 	f := &Fact{question: question}
 	f.id = GenerateID(f)
 	return f
 }
 
 func (fact *Fact) String() string {
-	return fmt.Sprintf("fact %s to question %s", fact.id, fact.question.id)
+	return fmt.Sprintf("fact %s to question %s", fact.id, fact.Id)
 }
 
 type Analysis struct {

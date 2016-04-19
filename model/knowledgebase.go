@@ -7,16 +7,57 @@ import (
 )
 
 type Knowledgebase struct {
-	QuestionGroups []KnowledgebaseObject
-	Theses         []Thesis
+	QuestionGroups map[string]QuestionGroup
+	allQuestions   map[string]Question
+	allTheses      map[string]Thesis
+	ThesisGroups   map[string]ThesisGroup
+}
+
+func NewKnowledgebase() *Knowledgebase {
+	k := &Knowledgebase{}
+	k.QuestionGroups = make(map[string]QuestionGroup)
+	k.allQuestions = make(map[string]Question)
+	k.allTheses = make(map[string]Thesis)
+	k.ThesisGroups = make(map[string]ThesisGroup)
+
+	return k
+}
+
+func (kb Knowledgebase) AddQuestionGroup(qg QuestionGroup) QuestionGroup {
+	qt, exists := kb.QuestionGroups[qg.id]
+	if exists == false {
+		kb.QuestionGroups[qg.id] = qg
+		qt = qg
+	}
+	return qt
+}
+
+func (kb Knowledgebase) AddThesisGroup(tg ThesisGroup) ThesisGroup {
+	tt, exists := kb.ThesisGroups[tg.id]
+	if exists == false {
+		kb.ThesisGroups[tg.id] = tg
+		tt = tg
+	}
+	return tt
+}
+
+func (kb Knowledgebase) AddThesis(tg ThesisGroup, t Thesis) {
+	ntg := kb.AddThesisGroup(tg)
+	ntg.AddThesis(t)
+
 }
 
 type KnowledgebaseObject interface {
 	String() string
+	Id() string
 }
 
 type AbstractKnowledgebaseObject struct {
 	id string
+}
+
+func (ako *AbstractKnowledgebaseObject) Id() string {
+	return ako.id
 }
 
 func GenerateID(i interface{}) string {
@@ -24,7 +65,7 @@ func GenerateID(i interface{}) string {
 	switch i.(type) {
 	default:
 		key = "K"
-	case *Question:
+	case *abstractQuestion:
 		key = "Q"
 	case *Thesis:
 		key = "T"
@@ -40,18 +81,38 @@ func GenerateID(i interface{}) string {
 
 }
 
-type Question struct {
+type QuestionGroup struct {
 	AbstractKnowledgebaseObject
 	text string
 }
 
-func NewQuestion(text string) *Question {
-	q := &Question{text: text}
+func NewQuestionGroup(text string) *QuestionGroup {
+	qg := &QuestionGroup{text: text}
+	qg.id = GenerateID(qg)
+	return qg
+}
+
+func (qg *QuestionGroup) AddQuestion() {
+
+}
+
+type Question interface {
+	String() string
+	Id() string
+}
+
+type abstractQuestion struct {
+	AbstractKnowledgebaseObject
+	text string
+}
+
+func NewQuestion(text string) *abstractQuestion {
+	q := &abstractQuestion{text: text}
 	q.id = GenerateID(q)
 	return q
 }
 
-func (question *Question) String() string {
+func (question *abstractQuestion) String() string {
 	return fmt.Sprintf("Question %s: %s", question.id, question.text)
 }
 
@@ -64,14 +125,14 @@ func NewOption(text string) *Option {
 }
 
 type OcQuestion struct {
-	Question
+	abstractQuestion
 	opts []*Option
 }
 
 func NewOcQuestion(text string) *OcQuestion {
 	oc := &OcQuestion{}
 	q := NewQuestion(text)
-	oc.Question = *q
+	oc.abstractQuestion = *q
 	return oc
 }
 
@@ -80,14 +141,14 @@ func (oc *OcQuestion) String() string {
 }
 
 type McQuestion struct {
-	Question
+	abstractQuestion
 	opts1 []*Option
 }
 
 func NewMcQuestion(text string) *McQuestion {
 	mc := &McQuestion{}
 	q := NewQuestion(text)
-	mc.Question = *q
+	mc.abstractQuestion = *q
 	return mc
 }
 
@@ -96,14 +157,14 @@ func (mc *McQuestion) String() string {
 }
 
 type TextQuestion struct {
-	Question
+	abstractQuestion
 	//answer string // TODO answer is a -->>fact
 }
 
 func NewTextQuestion(text string) *TextQuestion {
 	tq := &TextQuestion{}
 	q := NewQuestion(text)
-	tq.Question = *q
+	tq.abstractQuestion = *q
 	return tq
 }
 
@@ -112,19 +173,40 @@ func (tq *TextQuestion) String() string {
 }
 
 type NumQuestion struct {
-	Question
+	abstractQuestion
 	//answer int // TODO answer is a -->>fact
 }
 
 func NewNumQuestion(text string) *NumQuestion {
 	nq := &NumQuestion{}
 	q := NewQuestion(text)
-	nq.Question = *q
+	nq.abstractQuestion = *q
 	return nq
 }
 
 func (nq *NumQuestion) String() string {
 	return fmt.Sprintf("NumQuestion %s: %s", nq.id, nq.text)
+}
+
+type ThesisGroup struct {
+	AbstractKnowledgebaseObject
+	Theses map[string]Thesis
+	text   string
+}
+
+func NewThesisGroup(text string) *ThesisGroup {
+	tg := &ThesisGroup{text: text}
+	tg.id = GenerateID(tg)
+	return tg
+}
+
+func (tg *ThesisGroup) AddThesis(t Thesis) Thesis {
+	tt, exists := tg.Theses[t.id]
+	if exists == false {
+		tg.Theses[t.id] = t
+		tt = t
+	}
+	return tt
 }
 
 type Thesis struct {
