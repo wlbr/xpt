@@ -8,10 +8,10 @@ type Case struct {
 type Fact struct {
 	AbstractKnowledgebaseObject
 	id       string
-	question *abstractQuestion
+	question *Question
 }
 
-func NewFact(question *abstractQuestion) *Fact {
+func NewFact(question *Question) *Fact {
 	f := &Fact{question: question}
 	f.id = GenerateID(f)
 	return f

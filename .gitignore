@@ -31,3 +31,7 @@ _testmain.go
 .idea
 *.sublime-workspace
 *.sublime-project
+
+*~
+.*.swp
+.DS_Store

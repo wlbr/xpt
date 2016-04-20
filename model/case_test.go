@@ -10,4 +10,5 @@ func TestQuestion(t *testing.T) {
 	fmt.Println(q)
 	f := NewFact(q)
 	fmt.Println(f)
+
 }
