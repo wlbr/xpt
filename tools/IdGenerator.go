@@ -18,6 +18,22 @@ func GenSID(namespace string) string {
 	return fmt.Sprintf("%s%d", namespace, id)
 }
 
+func LastSID(namespace string) string {
+	id, success := sidstore[namespace]
+	if !success {
+		id = 0
+	}
+	return fmt.Sprintf("%s%d", namespace, id)
+}
+
 func SetLastSID(namespace string, id uint) {
 	sidstore[namespace] = id
+}
+
+func ResetSID(namespace string) {
+	delete(sidstore, namespace)
+}
+
+func ResetAllSID() {
+	sidstore = make(map[string]uint)
 }

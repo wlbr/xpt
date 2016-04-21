@@ -3,6 +3,8 @@ package model
 import "fmt"
 
 type Case struct {
+	kb *Knowledgebase
+
 }
 
 type Fact struct {
@@ -37,3 +39,4 @@ func NewAnalysis(thesis Thesis) *Analysis {
 func (analysis Analysis) String() string {
 	return fmt.Sprintf("Analysis %s to theses %s: Points: %s", analysis.id, analysis.thesis.id, analysis.points)
 }
+

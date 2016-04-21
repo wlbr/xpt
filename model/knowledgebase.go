@@ -3,34 +3,36 @@ package model
 import (
 	"fmt"
 	"xpt/tools"
-	// "math/big"
 )
 
 type Knowledgebase struct {
 	text                string
-	QuestionGroups      map[string]*QuestionGroup
-	allQuestions        map[string]Question
-	allTheses           map[string]Thesis
-	ThesisGroups        map[string]*ThesisGroup
-	StartupQuestions    *QuestionGroup
-	AllKnowledgeObjects map[string]*KnowledgebaseObject
+	questionGroups      map[string]*QuestionGroup
+	allQuestions        map[string]*Question
+	allTheses           map[string]*Thesis
+	thesisGroups        map[string]*ThesisGroup
+	startupQuestions    *QuestionGroup
+	allKnowledgeObjects map[string]KnowledgebaseObject
 }
 
 func NewKnowledgebase(text string) *Knowledgebase {
 	k := &Knowledgebase{text: text}
-	k.QuestionGroups = make(map[string]*QuestionGroup)
-	k.allQuestions = make(map[string]Question)
-	k.allTheses = make(map[string]Thesis)
-	k.ThesisGroups = make(map[string]*ThesisGroup)
-	k.AllKnowledgeObjects = make(map[string]*KnowledgebaseObject)
+	k.questionGroups = make(map[string]*QuestionGroup)
+	k.allQuestions = make(map[string]*Question)
+	k.allTheses = make(map[string]*Thesis)
+	k.thesisGroups = make(map[string]*ThesisGroup)
+	k.allKnowledgeObjects = make(map[string]KnowledgebaseObject)
 
 	return k
 }
 
-func (kb *Knowledgebase) describe(sep string) string {
+func (kb *Knowledgebase) Describe(sep string) string {
 	result := fmt.Sprintf("Knowledgebase: %s", kb.text)
-	for _, v := range kb.QuestionGroups {
-		result = result + "\n" + sep + v.describe(sep+sep)
+	for _, v := range kb.questionGroups {
+		result = result + "\n" + sep + v.Describe(sep+sep)
+	}
+	for _, v := range kb.thesisGroups {
+		result = result + "\n" + sep + v.Describe(sep+sep)
 	}
 	return result
 }
@@ -39,12 +41,29 @@ func (kb *Knowledgebase) String() string {
 	return fmt.Sprintf("Knowledgebase: %s", kb.text)
 }
 
+func (kb *Knowledgebase) AddKnowledbaseObject(objects ...KnowledgebaseObject) KnowledgebaseObject {
+	var first KnowledgebaseObject
+	for _, o := range objects {
+		ot, exists := kb.allKnowledgeObjects[o.Id()]
+		if exists == false {
+			kb.allKnowledgeObjects[o.Id()] = o
+			ot = o
+
+		}
+		if first == nil {
+			first = ot
+		}
+	}
+	return first
+}
+
 func (kb Knowledgebase) AddQuestionGroup(groups ...*QuestionGroup) *QuestionGroup {
 	var first *QuestionGroup
 	for _, qg := range groups {
-		qt, exists := kb.QuestionGroups[qg.id]
+		qt, exists := kb.questionGroups[qg.id]
 		if exists == false {
-			kb.QuestionGroups[qg.id] = qg
+			kb.AddKnowledbaseObject(qg)
+			kb.questionGroups[qg.id] = qg
 			qt = qg
 		}
 		if first == nil {
@@ -56,7 +75,7 @@ func (kb Knowledgebase) AddQuestionGroup(groups ...*QuestionGroup) *QuestionGrou
 
 func (kb Knowledgebase) AddStartupQuestions(qg *QuestionGroup) *QuestionGroup {
 	sq := kb.AddQuestionGroup(qg)
-	kb.StartupQuestions = sq
+	kb.startupQuestions = sq
 
 	return sq
 }
@@ -64,9 +83,10 @@ func (kb Knowledgebase) AddStartupQuestions(qg *QuestionGroup) *QuestionGroup {
 func (kb Knowledgebase) AddThesisGroup(groups ...*ThesisGroup) *ThesisGroup {
 	var first *ThesisGroup
 	for _, tg := range groups {
-		tt, exists := kb.ThesisGroups[tg.id]
+		tt, exists := kb.thesisGroups[tg.id]
 		if exists == false {
-			kb.ThesisGroups[tg.id] = tg
+			kb.AddKnowledbaseObject(tg)
+			kb.thesisGroups[tg.id] = tg
 			tt = tg
 		}
 		if first == nil {
@@ -76,14 +96,7 @@ func (kb Knowledgebase) AddThesisGroup(groups ...*ThesisGroup) *ThesisGroup {
 	return first
 }
 
-func (kb Knowledgebase) AddThesis(tg *ThesisGroup, t *Thesis) {
-	ntg := kb.AddThesisGroup(tg)
-	ntg.AddThesis(t)
-
-}
-
 type KnowledgebaseObject interface {
-	String() string
 	Id() string
 }
 
@@ -91,7 +104,11 @@ type AbstractKnowledgebaseObject struct {
 	id string
 }
 
-func (ako *AbstractKnowledgebaseObject) Id() string {
+func (ako *AbstractKnowledgebaseObject) String() string {
+	return fmt.Sprintf("AbstractKnowledgebaseObject", ako.id)
+}
+
+func (ako AbstractKnowledgebaseObject) Id() string {
 	return ako.id
 }
 
@@ -101,7 +118,7 @@ func GenerateID(i interface{}) string {
 	default:
 		key = "K"
 	case *ThesisGroup:
-		key = "Q"
+		key = "TG"
 	case *QuestionGroup:
 		key = "QG"
 	case *Question:
@@ -122,12 +139,12 @@ func GenerateID(i interface{}) string {
 
 type QuestionGroup struct {
 	AbstractKnowledgebaseObject
-	Questions map[string]*Question
+	Questions map[string]Evidence
 	text      string
 }
 
 func NewQuestionGroup(text string) *QuestionGroup {
-	qg := &QuestionGroup{text: text, Questions: make(map[string]*Question)}
+	qg := &QuestionGroup{text: text, Questions: make(map[string]Evidence)}
 	qg.id = GenerateID(qg)
 	return qg
 }
@@ -136,22 +153,22 @@ func (question *QuestionGroup) String() string {
 	return fmt.Sprintf("Questiongroup %s: %s", question.id, question.text)
 }
 
-func (qg *QuestionGroup) describe(sep string) string {
+func (qg *QuestionGroup) Describe(sep string) string {
 	result := fmt.Sprintf("%s", qg)
 	for _, v := range qg.Questions {
-		result = result + "\n" + sep + v.describe(sep+sep)
+		result = result + "\n" + sep + v.Describe(sep+sep)
 	}
 	return result
 }
 
-func (qg *QuestionGroup) AddQuestion(questions ...*Question) *Question {
-	var first *Question
+func (kb *Knowledgebase) AddQuestion(qg *QuestionGroup, questions ...Evidence) Evidence {
+	var first Evidence
 	for _, q := range questions {
-
 		qt, exists := qg.Questions[q.Id()]
 		if exists == false {
 			qg.Questions[q.Id()] = q
 			qt = q
+			kb.AddKnowledbaseObject(q)
 		}
 		if first == nil {
 			first = qt
@@ -160,8 +177,13 @@ func (qg *QuestionGroup) AddQuestion(questions ...*Question) *Question {
 	return first
 }
 
+func (kb *Knowledgebase) FindObject(id string) KnowledgebaseObject {
+	return kb.allKnowledgeObjects[id]
+}
+
 type Evidence interface {
 	String() string
+	Describe(string) string
 	Id() string
 }
 
@@ -180,10 +202,10 @@ func (question *Question) String() string {
 	return fmt.Sprintf("Question %s: %s", question.id, question.text)
 }
 
-func (qg *Question) describe(sep string) string {
+func (qg *Question) Describe(sep string) string {
 	result := fmt.Sprintf("%s", qg)
 	/*for k, v := range qg.Question {
-		result = result + v.describe()
+		result = result + v.Describe()
 	}*/
 	return result
 }
@@ -266,19 +288,32 @@ type ThesisGroup struct {
 	text   string
 }
 
+func (theses *ThesisGroup) String() string {
+	return fmt.Sprintf("Thesesgroup %s: %s", theses.id, theses.text)
+}
+
 func NewThesisGroup(text string) *ThesisGroup {
 	tg := &ThesisGroup{text: text, Theses: make(map[string]*Thesis)}
 	tg.id = GenerateID(tg)
 	return tg
 }
 
-func (tg *ThesisGroup) AddThesis(theses ...*Thesis) *Thesis {
+func (tg *ThesisGroup) Describe(sep string) string {
+	result := fmt.Sprintf("%s", tg)
+	for _, v := range tg.Theses {
+		result = result + "\n" + sep + v.Describe(sep+sep)
+	}
+	return result
+}
+
+func (kb *Knowledgebase) AddThesis(tg *ThesisGroup, theses ...*Thesis) *Thesis {
 	var first *Thesis
 	for _, t := range theses {
 		tt, exists := tg.Theses[t.id]
 		if exists == false {
 			tg.Theses[t.id] = t
 			tt = t
+			kb.AddKnowledbaseObject(t)
 		}
 		if first == nil {
 			first = tt
@@ -296,6 +331,14 @@ func NewTheses(text string) *Thesis {
 	t := &Thesis{text: text}
 	t.id = GenerateID(t)
 	return t
+}
+
+func (qg *Thesis) Describe(sep string) string {
+	result := fmt.Sprintf("%s", qg)
+	/*for k, v := range qg.Question {
+		result = result + v.Describe()
+	}*/
+	return result
 }
 
 func (theses *Thesis) String() string {
