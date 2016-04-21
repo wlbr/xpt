@@ -98,6 +98,8 @@ func (kb Knowledgebase) AddThesisGroup(groups ...*ThesisGroup) *ThesisGroup {
 
 type KnowledgebaseObject interface {
 	Id() string
+	String() string
+	Describe(string) string
 }
 
 type AbstractKnowledgebaseObject struct {
@@ -139,12 +141,12 @@ func GenerateID(i interface{}) string {
 
 type QuestionGroup struct {
 	AbstractKnowledgebaseObject
-	Questions map[string]Evidence
+	Questions map[string]KnowledgebaseObject
 	text      string
 }
 
 func NewQuestionGroup(text string) *QuestionGroup {
-	qg := &QuestionGroup{text: text, Questions: make(map[string]Evidence)}
+	qg := &QuestionGroup{text: text, Questions: make(map[string]KnowledgebaseObject)}
 	qg.id = GenerateID(qg)
 	return qg
 }
@@ -161,8 +163,8 @@ func (qg *QuestionGroup) Describe(sep string) string {
 	return result
 }
 
-func (kb *Knowledgebase) AddQuestion(qg *QuestionGroup, questions ...Evidence) Evidence {
-	var first Evidence
+func (kb *Knowledgebase) AddQuestion(qg *QuestionGroup, questions ...KnowledgebaseObject) KnowledgebaseObject {
+	var first KnowledgebaseObject
 	for _, q := range questions {
 		qt, exists := qg.Questions[q.Id()]
 		if exists == false {
@@ -181,12 +183,6 @@ func (kb *Knowledgebase) FindObject(id string) KnowledgebaseObject {
 	return kb.allKnowledgeObjects[id]
 }
 
-type Evidence interface {
-	String() string
-	Describe(string) string
-	Id() string
-}
-
 type Question struct {
 	AbstractKnowledgebaseObject
 	text string
@@ -202,11 +198,8 @@ func (question *Question) String() string {
 	return fmt.Sprintf("Question %s: %s", question.id, question.text)
 }
 
-func (qg *Question) Describe(sep string) string {
-	result := fmt.Sprintf("%s", qg)
-	/*for k, v := range qg.Question {
-		result = result + v.Describe()
-	}*/
+func (q *Question) Describe(sep string) string {
+	result := fmt.Sprintf("%s", q)
 	return result
 }
 
@@ -221,6 +214,14 @@ func NewOption(text string) *Option {
 type OcQuestion struct {
 	Question
 	opts []*Option
+}
+
+func (q *OcQuestion) Describe(sep string) string {
+	result := fmt.Sprintf("%s", q)
+	/*for k, v := range qg.Question {
+		result = result + v.Describe()
+	}*/
+	return result
 }
 
 func NewOcQuestion(text string) *OcQuestion {

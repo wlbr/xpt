@@ -84,3 +84,11 @@ func TestQuestions(t *testing.T) {
 	assertObject(t, ql[0], ql[0])
 
 }
+
+func TestDescribeVsString(t *testing.T) {
+	kb := prepareTests()
+	searchID := kb.FindObject("Q5")
+
+	fmt.Println("ToString: ", searchID)
+	fmt.Println("Describe: ", searchID.(*OcQuestion).Describe(""))
+}

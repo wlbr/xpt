@@ -1,8 +1,8 @@
 package model
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func assertBool(t *testing.T, gold bool, test bool) {
