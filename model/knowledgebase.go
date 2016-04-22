@@ -216,19 +216,19 @@ type OcQuestion struct {
 	opts []*Option
 }
 
+func NewOcQuestion(text string) *OcQuestion {
+	oc := &OcQuestion{}
+	q := NewQuestion(text)
+	oc.Question = *q
+	return oc
+}
+
 func (q *OcQuestion) Describe(sep string) string {
 	result := fmt.Sprintf("%s", q)
 	/*for k, v := range qg.Question {
 		result = result + v.Describe()
 	}*/
 	return result
-}
-
-func NewOcQuestion(text string) *OcQuestion {
-	oc := &OcQuestion{}
-	q := NewQuestion(text)
-	oc.Question = *q
-	return oc
 }
 
 func (oc *OcQuestion) String() string {
@@ -249,6 +249,14 @@ func NewMcQuestion(text string) *McQuestion {
 
 func (mc *McQuestion) String() string {
 	return fmt.Sprintf("McQuestion %s: %s", mc.id, mc.text)
+}
+
+func (q *McQuestion) Describe(sep string) string {
+	result := fmt.Sprintf("%s", q)
+	/*for k, v := range qg.Question {
+		result = result + v.Describe()
+	}*/
+	return result
 }
 
 type TextQuestion struct {
