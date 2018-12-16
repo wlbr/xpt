@@ -2,7 +2,8 @@ package model
 
 import (
 	"fmt"
-	"xpt/tools"
+
+	"github.com/wlbr/xpt/gotils"
 )
 
 type Knowledgebase struct {
@@ -134,7 +135,7 @@ func GenerateID(i interface{}) string {
 	case *Rule:
 		key = "R"
 	}
-	id := tools.GenSID(key)
+	id := gotils.GenSID(key)
 	return id
 
 }

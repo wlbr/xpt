@@ -1,4 +1,4 @@
-package tools
+package gotils
 
 import (
 	"fmt"
