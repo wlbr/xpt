@@ -108,7 +108,7 @@ type AbstractKnowledgebaseObject struct {
 }
 
 func (ako *AbstractKnowledgebaseObject) String() string {
-	return fmt.Sprintf("AbstractKnowledgebaseObject", ako.id)
+	return fmt.Sprintf("AbstractKnowledgebaseObject %s", ako.id)
 }
 
 func (ako AbstractKnowledgebaseObject) Id() string {

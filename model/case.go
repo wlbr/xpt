@@ -19,7 +19,7 @@ func NewFact(question *Question) *Fact {
 }
 
 func (fact *Fact) String() string {
-	return fmt.Sprintf("fact %s to question %s", fact.id, fact.Id)
+	return fmt.Sprintf("fact %s to question %s", fact.id, fact.question.id)
 }
 
 type Analysis struct {
@@ -36,5 +36,5 @@ func NewAnalysis(thesis Thesis) *Analysis {
 }
 
 func (analysis Analysis) String() string {
-	return fmt.Sprintf("Analysis %s to theses %s: Points: %s", analysis.id, analysis.thesis.id, analysis.points)
+	return fmt.Sprintf("Analysis %s to theses %s: Points: %d", analysis.id, analysis.thesis.id, analysis.points)
 }

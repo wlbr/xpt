@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"xpt/tools"
+
+	"github.com/wlbr/xpt/gotils"
 )
 
 func prepareTests() *Knowledgebase {
 	kb := NewKnowledgebase("IT Support")
-	tools.ResetAllSID()
+	gotils.ResetAllSID()
 
 	tpr := NewThesisGroup("Printer")
 	tn := NewThesisGroup("Network")

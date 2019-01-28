@@ -9,7 +9,7 @@ type Rule struct {
 }
 
 func (rule *Rule) String() string {
-	return fmt.Sprintf("Rule %s: %s", rule.id)
+	return fmt.Sprintf("Rule: %s", rule.id)
 }
 
 type Action interface {
